@@ -27,6 +27,3 @@ steps:
     --allow-unauthenticated
 options:
   logging: NONE
-
-build:
-  service_account: '$GCP_SERVICE_ACCOUNT'

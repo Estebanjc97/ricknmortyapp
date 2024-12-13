@@ -25,3 +25,8 @@ steps:
     --region=northamerica-northeast1 \ 
     --platform=managed \
     --allow-unauthenticated
+options:
+  logging: NONE
+
+build:
+  service_account: '$GCP_SERVICE_ACCOUNT'

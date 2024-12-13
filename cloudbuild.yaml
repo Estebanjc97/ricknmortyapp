@@ -1,0 +1,27 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker-compose'
+  args: ['build']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us.gcr.io/$PROJECT_ID/client:latest']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us.gcr.io/$PROJECT_ID/server:latest']
+- name: 'gcr.io/google.com/cloudsdk/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud run deploy client \
+    --image=us.gcr.io/$PROJECT_ID/client:latest \
+    --region=northamerica-northeast1 \
+    --platform=managed \
+    --allow-unauthenticated
+- name: 'gcr.io/google.com/cloudsdk/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    gcloud run deploy server \
+    --image=us.gcr.io/$PROJECT_ID/server:latest \
+    --region=northamerica-northeast1 \ 
+    --platform=managed \
+    --allow-unauthenticated

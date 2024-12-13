@@ -12,7 +12,7 @@ steps:
   - |
     gcloud run deploy client \
     --image=us.gcr.io/$PROJECT_ID/client:latest \
-    --region=northamerica-northeast1 \
+    --region=us-central1 \
     --platform=managed \
     --allow-unauthenticated
 - name: 'gcr.io/google.com/cloudsdk/cloud-sdk'
@@ -22,7 +22,7 @@ steps:
   - |
     gcloud run deploy server \
     --image=us.gcr.io/$PROJECT_ID/server:latest \
-    --region=northamerica-northeast1 \ 
+    --region=us-central1 \ 
     --platform=managed \
     --allow-unauthenticated
 options:

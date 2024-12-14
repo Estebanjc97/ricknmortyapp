@@ -2,6 +2,7 @@ services:
   server:
     build:
       context: ./server
+      image: ${PROJECT_ID}.cr.pkg.dev/us-central1/ricknmorty-server-repo/server:${TAG}
       dockerfile: server.Dockerfile
 
     ports:
@@ -10,9 +11,10 @@ services:
   client:
     depends_on:
       - server
-
+  
     build:
       context: ./client
+      image: ${PROJECT_ID}.cr.pkg.dev/us-central1/ricknmorty-client-repo/client:${TAG}
       dockerfile: frontend.Dockerfile
 
     ports:

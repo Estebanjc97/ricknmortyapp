@@ -4,8 +4,7 @@ export interface ApiResponse<T> {
 }
 
 export interface ApiInfo {
-  count: number;
-  pages: number;
-  next: string;
-  prev: string;
+  total: number;
+  status: number;
+  request: string;
 }

@@ -3,7 +3,7 @@ import { Character } from '../entities/character.entity';
 
 export interface CharacterRepository {
   getAll(
-    page?: number,
+    limit: number,
     name?: string,
     status?: string,
     type?: string,
@@ -14,4 +14,5 @@ export interface CharacterRepository {
   create(character: Character): Promise<void>;
   update(character: Character): Promise<void>;
   delete(id: string);
+  migrateApiData(): Promise<void>;
 }

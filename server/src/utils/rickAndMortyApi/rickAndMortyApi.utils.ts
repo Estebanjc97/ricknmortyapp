@@ -1,8 +1,9 @@
 import { ApiResponse } from '../entities/api.entity';
 
-const serverURL = 'https://ricknmortyserver-467042232272.us-central1.run.app/';
-
-export function mapApiEndpoint(data: ApiResponse<any>): ApiResponse<any> {
+export function mapApiEndpoint(
+  serverURL: string,
+  data: ApiResponse<any>,
+): ApiResponse<any> {
   const { info, ...rest } = data;
 
   if (info.next) {

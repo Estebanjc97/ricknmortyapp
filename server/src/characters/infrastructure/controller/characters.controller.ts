@@ -1,10 +1,14 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Param,
+  Post,
+  Put,
   Query,
   Res,
 } from '@nestjs/common';
@@ -12,8 +16,12 @@ import { CHARACTERS_CONTROLLER, GET_CHARACTER } from './routes';
 import { GetAllCharactersUseCase } from 'src/characters/application/get-all.usecase';
 import { Response } from 'express';
 import { GetCharactersUseCase } from 'src/characters/application/get.usecase';
-import { mapApiEndpoint } from 'src/utils/rickAndMortyApi/rickAndMortyApi.utils';
 import { ConfigService } from '@nestjs/config';
+import { CharacterDto, DeleteDto } from '../dto/characters.dto';
+import { CreateCharactersUseCase } from 'src/characters/application/create.usecase';
+import { Character } from 'src/characters/domain/entities/character.entity';
+import { UpdateCharactersUseCase } from 'src/characters/application/update.usecase';
+import { DeleteCharactersUseCase } from 'src/characters/application/delete.usecase';
 
 @Controller(CHARACTERS_CONTROLLER)
 export class CharactersController {
@@ -23,12 +31,15 @@ export class CharactersController {
     private configService: ConfigService,
     private readonly getAllCharactersUseCase: GetAllCharactersUseCase,
     private readonly getCharacterUseCase: GetCharactersUseCase,
+    private readonly createCharacterUseCase: CreateCharactersUseCase,
+    private readonly updateCharacterUseCase: UpdateCharactersUseCase,
+    private readonly deleteCharacterUseCase: DeleteCharactersUseCase,
   ) {}
 
   @Get()
   async getAll(
     @Res() res: Response,
-    @Query('page') page?: number,
+    @Query('limit') limit?: string,
     @Query('name') name?: string,
     @Query('status') status?: string,
     @Query('type') type?: string,
@@ -37,7 +48,7 @@ export class CharactersController {
   ) {
     try {
       const characters = await this.getAllCharactersUseCase.execute(
-        page,
+        parseInt(limit),
         name,
         status,
         type,
@@ -45,13 +56,12 @@ export class CharactersController {
         gender,
       );
       if (characters.results.length === 0) {
-        return res.status(HttpStatus.NO_CONTENT).send();
+        return res.status(HttpStatus.OK).send([]);
       }
 
-      return res
-        .status(HttpStatus.OK)
-        .json(mapApiEndpoint(this.serverEndpoint, characters));
+      return res.status(HttpStatus.OK).json(characters);
     } catch (error) {
+      console.log(error);
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -65,10 +75,52 @@ export class CharactersController {
       const characters = await this.getCharacterUseCase.execute(id);
 
       if (characters.length === 0) {
-        return res.status(HttpStatus.NO_CONTENT).send();
+        return res.status(HttpStatus.OK).send([]);
       }
 
       return res.status(HttpStatus.OK).json(characters);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  @Post()
+  async create(@Body() data: CharacterDto, @Res() res: Response) {
+    try {
+      await this.createCharacterUseCase.execute({
+        ...data,
+        created: '',
+      } as unknown as Character);
+      return res.status(HttpStatus.OK).send();
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  @Put()
+  async update(@Body() data: CharacterDto, @Res() res: Response) {
+    try {
+      await this.updateCharacterUseCase.execute(data as unknown as Character);
+      return res.status(HttpStatus.OK).send();
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  @Delete()
+  async delete(@Body() data: DeleteDto, @Res() res: Response) {
+    try {
+      await this.deleteCharacterUseCase.execute(data.id);
+      return res.status(HttpStatus.OK).send();
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

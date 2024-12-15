@@ -1,44 +1,168 @@
 import { Injectable } from '@nestjs/common';
 import { Character } from 'src/characters/domain/entities/character.entity';
 import { CharacterRepository } from 'src/characters/domain/repository/characters.repository';
+import { FirestoreFilter } from 'src/services/firestore/firestore.entity';
+import { FirestoreService } from 'src/services/firestore/firestore.service';
 import { RickAndMortyService } from 'src/services/rickAndMorty/rickAndMorty.service';
 import { ApiResponse } from 'src/utils/entities/api.entity';
+import { getIds } from 'src/utils/rickAndMortyApi/rickAndMortyApi.utils';
+
+const apiMaxPages = 42;
+const charactersCollection = 'characters';
+const deletedCollection = 'deleted';
 
 @Injectable()
 export class CharacterRepositoryImpl implements CharacterRepository {
-  constructor(private readonly rickAndMortyService: RickAndMortyService) {}
+  constructor(
+    private readonly rickAndMortyService: RickAndMortyService,
+    private readonly firestoreService: FirestoreService,
+  ) {}
 
-  getAll(
-    page?: number,
+  async getAll(
+    limit: number = 0,
     name?: string,
     status?: string,
     type?: string,
     species?: string,
     gender?: string,
   ): Promise<ApiResponse<Character>> {
-    return this.rickAndMortyService.getAllCharacters(
-      page,
-      name,
-      status,
-      type,
-      species,
-      gender,
-    );
+    try {
+      const filterParams: { [key: string]: string | undefined } = {
+        name,
+        status,
+        type,
+        species,
+        gender,
+      };
+      const filters: FirestoreFilter[] = Object.entries(filterParams).reduce(
+        (accum, [field, value]) => {
+          if (value) {
+            accum.push({ field, operator: '==', value });
+          }
+          return accum;
+        },
+        [] as FirestoreFilter[],
+      );
+
+      const createdCharacters = await this.firestoreService.getAllDocuments(
+        charactersCollection,
+        limit,
+        filters,
+        'id',
+        'asc',
+      );
+
+      return {
+        info: {
+          request: 'getAll',
+          total: createdCharacters.length,
+          status: 200,
+        },
+        results: createdCharacters,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
-  get(id: string): Promise<Array<Character>> {
-    return this.rickAndMortyService.getCharacterById(id);
+  async get(id: string): Promise<Array<Character>> {
+    const results = [];
+
+    try {
+      const promises = getIds(id).map((_id) =>
+        this.firestoreService.getDocument(charactersCollection, _id),
+      );
+      const storedCharacters = await Promise.all(promises);
+
+      results.push(...storedCharacters.filter((character) => character));
+
+      return results;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  create(character: Character): Promise<void> {
-    throw new Error('Method not implemented.');
+  async create(character: Character): Promise<void> {
+    try {
+      const storedCharacters =
+        await this.firestoreService.getAllDocuments(charactersCollection);
+      const nextId = storedCharacters.length + 1;
+      const created = new Date().toISOString();
+      await this.firestoreService.addDocument(
+        charactersCollection,
+        `${nextId}`,
+        {
+          ...character,
+          created,
+        },
+      );
+      return;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
-  update(character: Character): Promise<void> {
-    throw new Error('Method not implemented.');
+  async update(character: Character): Promise<void> {
+    if (!character.id) {
+      throw new Error('Should send the character Id.');
+    }
+
+    try {
+      await this.firestoreService.updateDocument(
+        charactersCollection,
+        `${character.id}`,
+        character,
+      );
+      return;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  delete(id: string) {
-    throw new Error('Method not implemented.');
+  async delete(id: string) {
+    try {
+      const character = await this.firestoreService.getDocument(
+        charactersCollection,
+        id,
+      );
+      const deleted = new Date().toISOString();
+      await this.firestoreService.addDocument(deletedCollection, id, {
+        deleted,
+        ...character,
+      });
+      await this.firestoreService.deleteDocument(charactersCollection, id);
+      return;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async migrateApiData() {
+    let promises = [];
+    console.log('start migration');
+    try {
+      for (let index = 1; index <= apiMaxPages; index++) {
+        promises.push(this.rickAndMortyService.getAllCharacters(index));
+      }
+      const allPromises = await Promise.all(promises);
+      promises = [];
+      allPromises.forEach((resultPromise) => {
+        resultPromise.results.forEach((character) => {
+          promises.push(
+            this.firestoreService.addDocument(
+              charactersCollection,
+              `${character.id}`,
+              character,
+            ),
+          );
+        });
+      });
+      await Promise.all(promises);
+      return;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

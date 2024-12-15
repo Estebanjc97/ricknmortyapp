@@ -25,6 +25,8 @@ import { DeleteCharactersUseCase } from 'src/characters/application/delete.useca
 
 @Controller(CHARACTERS_CONTROLLER)
 export class CharactersController {
+  private serverEndpoint = this.configService.get<string>('SERVER_ENDPOINT');
+
   constructor(
     private configService: ConfigService,
     private readonly getAllCharactersUseCase: GetAllCharactersUseCase,

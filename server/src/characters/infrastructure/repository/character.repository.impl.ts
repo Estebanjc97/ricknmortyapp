@@ -1,43 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { Character } from 'src/characters/domain/entities/character.entity';
 import { CharacterRepository } from 'src/characters/domain/repository/characters.repository';
+import { RickAndMortyService } from 'src/services/rickAndMorty/rickAndMorty.service';
+import { ApiResponse } from 'src/utils/entities/api.entity';
 
 @Injectable()
 export class CharacterRepositoryImpl implements CharacterRepository {
-  constructor() {}
+  constructor(private readonly rickAndMortyService: RickAndMortyService) {}
 
-  getAll(): Promise<Array<Character>> {
-    return new Promise((res) => {
-      res([
-        {
-          id: 2,
-          name: 'Morty Smith',
-          status: 'Alive',
-          species: 'Human',
-          type: '',
-          gender: 'Male',
-          origin: {
-            name: 'Earth',
-            url: 'https://rickandmortyapi.com/api/location/1',
-          },
-          location: {
-            name: 'Earth',
-            url: 'https://rickandmortyapi.com/api/location/20',
-          },
-          image: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
-          episode: [
-            'https://rickandmortyapi.com/api/episode/1',
-            'https://rickandmortyapi.com/api/episode/2',
-          ],
-          url: 'https://rickandmortyapi.com/api/character/2',
-          created: '2017-11-04T18:50:21.651Z',
-        },
-      ]);
-    });
+  getAll(
+    page?: number,
+    name?: string,
+    status?: string,
+    type?: string,
+    species?: string,
+    gender?: string,
+  ): Promise<ApiResponse<Character>> {
+    return this.rickAndMortyService.getAllCharacters(
+      page,
+      name,
+      status,
+      type,
+      species,
+      gender,
+    );
   }
 
-  get(id: string): Promise<Character> {
-    throw new Error('Method not implemented.');
+  get(id: string): Promise<Array<Character>> {
+    return this.rickAndMortyService.getCharacterById(id);
   }
 
   create(character: Character): Promise<void> {

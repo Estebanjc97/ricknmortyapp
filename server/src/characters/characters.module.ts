@@ -1,17 +1,22 @@
 import { Module } from '@nestjs/common';
 import { CharacterRepositoryImpl } from './infrastructure/repository/character.repository.impl';
 import { GetAllCharactersUseCase } from './application/get-all.usecase';
-import { GetAllCharactersController } from './infrastructure/controller/getAll.controller';
+import { CharactersController } from './infrastructure/controller/characters.controller';
+import { RickAndMortyService } from 'src/services/rickAndMorty/rickAndMorty.service';
+import { HttpModule } from '@nestjs/axios';
+import { GetCharactersUseCase } from './application/get.usecase';
 
 @Module({
-  controllers: [GetAllCharactersController],
-  imports: [],
+  controllers: [CharactersController],
+  imports: [HttpModule],
   providers: [
     {
       provide: 'CharacterRepositoryImpl',
       useClass: CharacterRepositoryImpl,
     },
     GetAllCharactersUseCase,
+    GetCharactersUseCase,
+    RickAndMortyService,
   ],
   exports: [],
 })

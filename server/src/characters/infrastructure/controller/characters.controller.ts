@@ -13,10 +13,14 @@ import { GetAllCharactersUseCase } from 'src/characters/application/get-all.usec
 import { Response } from 'express';
 import { GetCharactersUseCase } from 'src/characters/application/get.usecase';
 import { mapApiEndpoint } from 'src/utils/rickAndMortyApi/rickAndMortyApi.utils';
+import { ConfigService } from '@nestjs/config';
 
 @Controller(CHARACTERS_CONTROLLER)
 export class CharactersController {
+  private serverEndpoint = this.configService.get<string>('SERVER_ENDPOINT');
+
   constructor(
+    private configService: ConfigService,
     private readonly getAllCharactersUseCase: GetAllCharactersUseCase,
     private readonly getCharacterUseCase: GetCharactersUseCase,
   ) {}
@@ -44,7 +48,9 @@ export class CharactersController {
         return res.status(HttpStatus.NO_CONTENT).send();
       }
 
-      return res.status(HttpStatus.OK).json(mapApiEndpoint(characters));
+      return res
+        .status(HttpStatus.OK)
+        .json(mapApiEndpoint(this.serverEndpoint, characters));
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

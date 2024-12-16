@@ -13,8 +13,8 @@ export class CharactersService {
 
   constructor(private http: HttpClient) { }
 
-  getCharacters(limit: number): Observable<ApiResponse<Character>> {
-    return this.http.get<any>(`${this.apiUrl}/characters?limit=${limit}`);
+  getCharacters(start: number, end: number): Observable<ApiResponse<Character>> {
+    return this.http.get<any>(`${this.apiUrl}/characters?start=${start}&end=${end}`);
   }
 
 }

@@ -16,23 +16,35 @@ import { FooterComponent } from '../../components/footer/footer.component';
 export class HomeComponent implements OnInit {
 
   items:Array<Character> = [];
+  pagination = {
+    length: 0,
+    pageSize: 8,
+    pageIndex: 0,
+    previousPageIndex: 0,
+  };
+  pageSizeOptions = [8, 16, 32, 64];
 
   constructor(private readonly charactersService: CharactersService) 
     {}
 
   ngOnInit(): void {
-    this.getCharacters(8);
+    this.getCharacters();
   }
 
-  getCharacters(limit: number) {
-    this.charactersService.getCharacters(limit).subscribe(response => {
+  getCharacters() {
+    const start = this.pagination.pageIndex * this.pagination.pageSize;
+    const end = (this.pagination.pageIndex + 1) * this.pagination.pageSize;
+    this.charactersService.getCharacters(start, end).subscribe(response => {
+      this.pagination.length = response.info.total;
       this.items = response.results;
     });
   }
 
   handlePageEvent(e: PageEvent) {
-    console.log(e)
-    this.getCharacters(e.pageSize);
+    this.pagination.pageIndex = e.pageIndex;
+    this.pagination.previousPageIndex = e.previousPageIndex || 0;
+    this.pagination.pageSize = e.pageSize;
+    this.getCharacters();
   }
   
 }

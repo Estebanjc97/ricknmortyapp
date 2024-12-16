@@ -3,7 +3,8 @@ import { Character } from '../entities/character.entity';
 
 export interface CharacterRepository {
   getAll(
-    limit: number,
+    start: number,
+    end: number,
     name?: string,
     status?: string,
     type?: string,

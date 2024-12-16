@@ -14,10 +14,10 @@
             }
         </mat-grid-list>
         <mat-paginator class="list-paginator" 
-                      [length]="100"
-                      [pageSize]="8"
+                      [length]="pagination.length"
+                      [pageSize]="pagination.pageSize"
                       (page)="handlePageEvent($event)"
-                      [pageSizeOptions]="[8, 16, 32, 64]"
+                      [pageSizeOptions]="pageSizeOptions"
                       aria-label="Select page">
         </mat-paginator>
     </div>

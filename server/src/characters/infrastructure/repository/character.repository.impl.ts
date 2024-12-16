@@ -19,7 +19,8 @@ export class CharacterRepositoryImpl implements CharacterRepository {
   ) {}
 
   async getAll(
-    limit: number = 0,
+    start: number = 0,
+    end: number = 0,
     name?: string,
     status?: string,
     type?: string,
@@ -46,16 +47,20 @@ export class CharacterRepositoryImpl implements CharacterRepository {
 
       const createdCharacters = await this.firestoreService.getAllDocuments(
         charactersCollection,
-        limit,
+        end + 1,
+        start,
         filters,
         'id',
         'asc',
       );
 
+      const totalCharacters =
+        await this.firestoreService.getTotalDocuments(charactersCollection);
+
       return {
         info: {
           request: 'getAll',
-          total: createdCharacters.length,
+          total: totalCharacters,
           status: 200,
         },
         results: createdCharacters,
@@ -84,9 +89,9 @@ export class CharacterRepositoryImpl implements CharacterRepository {
 
   async create(character: Character): Promise<void> {
     try {
-      const storedCharacters =
-        await this.firestoreService.getAllDocuments(charactersCollection);
-      const nextId = storedCharacters.length + 1;
+      const totalCharacters =
+        await this.firestoreService.getTotalDocuments(charactersCollection);
+      const nextId = totalCharacters + 1;
       const created = new Date().toISOString();
       await this.firestoreService.addDocument(
         charactersCollection,

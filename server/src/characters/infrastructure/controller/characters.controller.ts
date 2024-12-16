@@ -39,7 +39,8 @@ export class CharactersController {
   @Get()
   async getAll(
     @Res() res: Response,
-    @Query('limit') limit?: string,
+    @Query('start') start?: string,
+    @Query('end') end?: string,
     @Query('name') name?: string,
     @Query('status') status?: string,
     @Query('type') type?: string,
@@ -48,7 +49,8 @@ export class CharactersController {
   ) {
     try {
       const characters = await this.getAllCharactersUseCase.execute(
-        parseInt(limit),
+        parseInt(start),
+        parseInt(end),
         name,
         status,
         type,

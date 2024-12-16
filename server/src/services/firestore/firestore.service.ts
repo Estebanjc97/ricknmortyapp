@@ -34,7 +34,8 @@ export class FirestoreService {
 
   async getAllDocuments(
     collection: string,
-    limit: number = 0,
+    end: number,
+    start: number = 0,
     filters: FirestoreFilter[] = [],
     orderByField: string = '',
     orderByDirection: 'asc' | 'desc' = 'asc',
@@ -49,9 +50,7 @@ export class FirestoreService {
       query = query.orderBy(orderByField, orderByDirection);
     }
 
-    if (limit > 0) {
-      query = query.limit(limit);
-    }
+    query = query.startAt(start).endBefore(end);
 
     const snapshot = await query.get();
 
@@ -65,6 +64,11 @@ export class FirestoreService {
     }));
 
     return documents;
+  }
+
+  async getTotalDocuments(collection: string): Promise<number> {
+    const snapshot = await this.firestore.collection(collection).get();
+    return snapshot.size;
   }
 
   async updateDocument(

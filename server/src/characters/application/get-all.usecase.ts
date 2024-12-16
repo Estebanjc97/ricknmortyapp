@@ -11,7 +11,8 @@ export class GetAllCharactersUseCase {
   ) {}
 
   execute(
-    page?: number,
+    start: number,
+    end: number = 0,
     name?: string,
     status?: string,
     type?: string,
@@ -19,7 +20,8 @@ export class GetAllCharactersUseCase {
     gender?: string,
   ): Promise<ApiResponse<Character>> {
     return this.characterRepository.getAll(
-      page,
+      start,
+      end,
       name,
       status,
       type,

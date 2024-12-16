@@ -1,0 +1,25 @@
+<div class="app-wrapper">
+    <app-navbar></app-navbar>
+    <div class="app-content">
+        <mat-grid-list cols="4" rowHeight="2:1" class="list-wrapper">
+            @for (item of items; track item.id) {
+                <mat-grid-tile class="list-item">
+                    <character-card 
+                    [title]="item.name" 
+                    [imageUrl]="item.image"
+                    ></character-card>
+                </mat-grid-tile>
+            } @empty {
+                <p>There are no items to show.</p>
+            }
+        </mat-grid-list>
+        <mat-paginator class="list-paginator" 
+                      [length]="100"
+                      [pageSize]="8"
+                      (page)="handlePageEvent($event)"
+                      [pageSizeOptions]="[8, 16, 32, 64]"
+                      aria-label="Select page">
+        </mat-paginator>
+    </div>
+    <app-footer></app-footer>
+</div>

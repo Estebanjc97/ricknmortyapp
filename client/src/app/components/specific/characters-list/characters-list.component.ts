@@ -11,6 +11,7 @@ import { CharacterViewDialogComponent } from '../character-view-dialog/character
 import { isPlatformBrowser } from '@angular/common';
 import { FloatingButtonComponent } from '../../common/floating-button/floating-button.component';
 import { DOOMIE_CHARACTER } from '../../../utils/characters.utils';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const DEFAULT_PAGINATION = {
   length: 0,
@@ -21,11 +22,13 @@ const DEFAULT_PAGINATION = {
 
 @Component({
   selector: 'characters-list',
-  imports: [CharacterCardComponent, MatGridListModule, MatPaginatorModule, FloatingButtonComponent],
+  imports: [CharacterCardComponent, MatGridListModule, MatPaginatorModule, FloatingButtonComponent, MatProgressSpinnerModule],
   templateUrl: './characters-list.component.html',
   styleUrl: './characters-list.component.scss'
 })
 export class CharactersListComponent implements OnInit {
+
+  isLoading = signal(false);
 
   readonly charactersService = inject(CharactersService);
   readonly dialog = inject(MatDialog);
@@ -47,16 +50,21 @@ export class CharactersListComponent implements OnInit {
     }
   }
 
-  getCharacters() {
-    const start = (this.pagination().pageIndex * this.pagination().pageSize) + 1;
-    const end = (this.pagination().pageIndex + 1) * this.pagination().pageSize;
-    this.charactersService.getCharacters(start, end)
+  getCharacters(useLoader = true) {
+    useLoader && this.isLoading.set(true);
+    const limit = this.pagination().pageSize;
+    const page = this.pagination().pageIndex + 1;
+    this.charactersService.getCharacters(limit, page)
     .pipe(
       filter( (characters:ApiResponse<Character>) => characters.results.length > 0 )
     )
-    .subscribe((response: ApiResponse<Character>) => {
-      this.pagination().length = response.info.total;
-      this.items.set(response.results);
+    .subscribe({
+      next: (response: ApiResponse<Character>) => {
+        this.pagination().length = response.info.total;
+        this.items.set(response.results);
+      },
+      error: () => alert("Error getting characters"),
+      complete: () => this.isLoading.set(false)
     });
   }
 
@@ -78,8 +86,8 @@ export class CharactersListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined) {
-        //Read the result, for changes.
+      if (result === "refresh") {
+        this.getCharacters(false);
       }
     });
   }

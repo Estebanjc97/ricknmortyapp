@@ -23,6 +23,7 @@ import { RickAndMortyApiInfo, RickAndMortyApiResponse } from '../../../utils/api
 import { Episode } from '../../../services/episodes/episodes.entity';
 import { isPlatformBrowser } from '@angular/common';
 import { CharactersService } from '../../../services/characters/characters.service';
+import { ConfirmationDialogComponent } from '../../common/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'character-view-dialog',
@@ -45,6 +46,8 @@ import { CharactersService } from '../../../services/characters/characters.servi
 export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
 
   @ViewChild('episodesSelect') matSelect!: MatSelect;
+
+  readonly dialog = inject(MatDialog);
 
   dialogMode: "edit" | "create" = "create";
 
@@ -141,7 +144,6 @@ export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
       if (Object.prototype.hasOwnProperty.call(this.data, key)) {
         const value = this.data[key as keyof Character];
         if (typeof value === "string" && key !== "created") {
-          console.log(key)
           this.form.addControl(key, new FormControl(value, [Validators.required, Validators.minLength(3)]))
         } else if (isCharacterLocation(value)) {
           this.form.addControl(`${key}-name`, new FormControl(value.name, [Validators.required, Validators.minLength(3)]))
@@ -171,7 +173,7 @@ export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
   updateCharacter(character: Character) {
     this.charactersService.updateCharacter(character)
     .subscribe({
-      next: () => console.log("Character Updated!"),
+      next: () => this.alertOperationAndClose("Character Updated!"),
       error: () => alert("Error updating the character!"),
     });
   }
@@ -179,9 +181,34 @@ export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
   createCharacter(character: Character) {
     this.charactersService.createCharacter(character)
     .subscribe({
-      next: () => console.log("Character Created!"),
+      next: () => this.alertOperationAndClose("Character Created!"),
       error: () => alert("Error creating the character!"),
     });
+  }
+
+  deleteCharacter() {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '250px',
+      data: {
+        title: `Delete ${this.data.name}`,
+        question: `Are you sure you want to delete this character?`
+      }
+    });
+    
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.charactersService.deleteCharacter(this.data.id || 0)
+        .subscribe({
+          next: () => this.alertOperationAndClose("Character deleted!"),
+          error: () => { alert("Error deleting the character!") },
+        })
+      }
+    });
+  }
+
+  alertOperationAndClose(message: string) {
+    alert(message); 
+    this.dialogRef.close("refresh");
   }
 
   createCharacterFromFormData():Character {
@@ -202,7 +229,7 @@ export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
       image: this.form.value.image,
       episode: this.form.value.episodes,
       url: this.form.value.url,
-      created: this.form.value.created,
+      created: this.data.created,
     };
   }
 

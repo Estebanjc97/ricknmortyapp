@@ -17,7 +17,7 @@ import { GetAllCharactersUseCase } from 'src/characters/application/get-all.usec
 import { Response } from 'express';
 import { GetCharactersUseCase } from 'src/characters/application/get.usecase';
 import { ConfigService } from '@nestjs/config';
-import { CharacterDto, DeleteDto } from '../dto/characters.dto';
+import { CharacterDto } from '../dto/characters.dto';
 import { CreateCharactersUseCase } from 'src/characters/application/create.usecase';
 import { Character } from 'src/characters/domain/entities/character.entity';
 import { UpdateCharactersUseCase } from 'src/characters/application/update.usecase';
@@ -25,8 +25,6 @@ import { DeleteCharactersUseCase } from 'src/characters/application/delete.useca
 
 @Controller(CHARACTERS_CONTROLLER)
 export class CharactersController {
-  private serverEndpoint = this.configService.get<string>('SERVER_ENDPOINT');
-
   constructor(
     private configService: ConfigService,
     private readonly getAllCharactersUseCase: GetAllCharactersUseCase,
@@ -39,8 +37,8 @@ export class CharactersController {
   @Get()
   async getAll(
     @Res() res: Response,
-    @Query('start') start?: string,
-    @Query('end') end?: string,
+    @Query('limit') limit?: string,
+    @Query('page') page?: string,
     @Query('name') name?: string,
     @Query('status') status?: string,
     @Query('type') type?: string,
@@ -49,8 +47,8 @@ export class CharactersController {
   ) {
     try {
       const characters = await this.getAllCharactersUseCase.execute(
-        parseInt(start),
-        parseInt(end),
+        parseInt(limit),
+        parseInt(page),
         name,
         status,
         type,
@@ -118,10 +116,10 @@ export class CharactersController {
     }
   }
 
-  @Delete()
-  async delete(@Body() data: DeleteDto, @Res() res: Response) {
+  @Delete(GET_CHARACTER)
+  async delete(@Param('id') id: number, @Res() res: Response) {
     try {
-      await this.deleteCharacterUseCase.execute(`${data.id}`);
+      await this.deleteCharacterUseCase.execute(`${id}`);
       return res.status(HttpStatus.OK).send();
     } catch (error) {
       if (error instanceof NotFoundException) {

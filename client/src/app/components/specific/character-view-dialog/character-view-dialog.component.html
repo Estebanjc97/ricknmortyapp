@@ -153,7 +153,7 @@
 <mat-dialog-actions>
   <button mat-button [disabled]="!form.valid" (click)="handleChanges()">Apply</button>
   @if (dialogMode === "edit") {
-    <button mat-button (click)="handleChanges()">Delete</button>
+    <button mat-button (click)="deleteCharacter()">Delete</button>
   }
   <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

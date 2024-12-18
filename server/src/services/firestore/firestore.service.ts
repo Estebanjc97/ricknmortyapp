@@ -34,12 +34,16 @@ export class FirestoreService {
 
   async getAllDocuments(
     collection: string,
-    end: number,
-    start: number = 0,
+    limitCount: number,
+    page: number,
     filters: FirestoreFilter[] = [],
     orderByField: string = '',
     orderByDirection: 'asc' | 'desc' = 'asc',
   ): Promise<any[]> {
+    if (page < 1) {
+      throw new Error('Page number must be greater than or equal to 1.');
+    }
+
     let query: any = this.firestore.collection(collection);
 
     for (const filter of filters) {
@@ -50,7 +54,20 @@ export class FirestoreService {
       query = query.orderBy(orderByField, orderByDirection);
     }
 
-    query = query.startAt(start).endBefore(end);
+    const skip = (page - 1) * limitCount;
+
+    if (skip > 0) {
+      const skipSnapshot = await query.limit(skip).get();
+
+      if (skipSnapshot.docs.length < skip) {
+        return [];
+      }
+
+      const lastDoc = skipSnapshot.docs[skipSnapshot.docs.length - 1];
+      query = query.startAfter(lastDoc);
+    }
+
+    query = query.limit(limitCount);
 
     const snapshot = await query.get();
 
@@ -67,8 +84,13 @@ export class FirestoreService {
   }
 
   async getTotalDocuments(collection: string): Promise<number> {
-    const snapshot = await this.firestore.collection(collection).get();
-    return snapshot.size;
+    try {
+      const snapshot = await this.firestore.collection(collection).get();
+      return snapshot.size;
+    } catch (error) {
+      console.error('Error getting all documents:', error);
+      return 0;
+    }
   }
 
   async updateDocument(

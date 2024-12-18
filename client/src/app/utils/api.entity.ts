@@ -8,3 +8,15 @@ export interface ApiInfo {
   status: number;
   request: string;
 }
+
+export interface RickAndMortyApiResponse<T> {
+  info: RickAndMortyApiInfo;
+  results: Array<T>;
+}
+
+export interface RickAndMortyApiInfo {
+  count: number,
+  pages: number,
+  next: string | null,
+  prev: string | null
+}

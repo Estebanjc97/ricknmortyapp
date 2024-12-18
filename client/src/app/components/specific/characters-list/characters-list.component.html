@@ -1,4 +1,4 @@
-<mat-grid-list cols="4" rowHeight="2:1" class="list-wrapper">
+<mat-grid-list [cols]="cols" rowHeight="2:1" class="list-wrapper">
     @for (item of items(); track item.id) {
         <mat-grid-tile class="list-item">
             <character-card 
@@ -17,3 +17,9 @@
               [pageSizeOptions]="pageSizeOptions"
               aria-label="Select page">
 </mat-paginator>
+<floating-button 
+  icon="add" 
+  tooltip="Add Character" 
+  position="bottom-left" 
+  (buttonClick)="onFloatingButtonClick()">
+</floating-button>

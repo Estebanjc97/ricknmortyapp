@@ -5,6 +5,7 @@ import {
   IsDateString,
   ValidateNested,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -18,8 +19,8 @@ export class CharacterLocationDto {
 
 export class CharacterDto {
   @IsOptional()
-  @IsString()
-  id?: string;
+  @IsNumber()
+  id?: number;
 
   @IsString()
   name: string;
@@ -60,6 +61,6 @@ export class CharacterDto {
 }
 
 export class DeleteDto {
-  @IsString()
-  id: string;
+  @IsNumber()
+  id: number;
 }

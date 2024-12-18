@@ -97,6 +97,7 @@ export class CharacterRepositoryImpl implements CharacterRepository {
         charactersCollection,
         `${nextId}`,
         {
+          id: nextId,
           ...character,
           created,
         },

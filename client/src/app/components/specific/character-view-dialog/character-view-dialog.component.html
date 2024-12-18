@@ -1,7 +1,159 @@
-<h2 mat-dialog-title>Character Name</h2>
+@if (dialogMode === "edit") {
+  <h2 mat-dialog-title> Character #{{ data.id }} </h2>
+} @else {
+  <h2 mat-dialog-title> Create Character </h2>
+}
+
 <mat-dialog-content>
-  <p>What's your favorite animal?</p>
+  <mat-grid-list cols="2" rowHeight="3:1">
+    <form [formGroup]="form">
+      <mat-grid-tile
+        [colspan]="2"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Name </mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="4"
+      >
+        <img class='card-image' [src]="characterImage()" alt="Rick And Morty Character Image" />
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Status </mat-label>
+          <mat-select formControlName="status">
+            @for (status of statuses; track status.value) {
+              <mat-option [value]="status.value">{{status.viewValue}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Species </mat-label>
+          <input matInput formControlName="species">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Type </mat-label>
+          <input matInput formControlName="type">
+        </mat-form-field>
+      </mat-grid-tile>
+      
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Gender </mat-label>
+          <input matInput formControlName="gender">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Origin Name </mat-label>
+          <input matInput formControlName="origin-name">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Origin URL </mat-label>
+          <input matInput formControlName="origin-url">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Location Name </mat-label>
+          <input matInput formControlName="location-name">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Location URL </mat-label>
+          <input matInput formControlName="location-url">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="2"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> Image </mat-label>
+          <input matInput formControlName="image">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile
+        [colspan]="2"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label> URL </mat-label>
+          <input matInput formControlName="url">
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="2"
+        [rowspan]="1"
+      >
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Episodes</mat-label>
+          <mat-select #episodesSelect formControlName="episodes" multiple>
+            @for (episode of episodes(); track episode) {
+              <mat-option [value]="episode.url">{{episode.name}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile
+        [colspan]="2"
+        [rowspan]="1"
+      >
+        <p appearance="outline">
+          Create at {{ data.created }}
+        </p>
+      </mat-grid-tile>
+    </form>
+  </mat-grid-list>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button>No Thanks</button>
+  <button mat-button [disabled]="!form.valid" (click)="handleChanges()">Apply</button>
+  @if (dialogMode === "edit") {
+    <button mat-button (click)="handleChanges()">Delete</button>
+  }
+  <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

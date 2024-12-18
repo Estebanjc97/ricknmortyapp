@@ -1,10 +1,10 @@
-interface CharacterLocation {
+export interface CharacterLocation {
   name: string;
   url: string;
 }
 
 export interface Character {
-  id: number;
+  id?: number;
   name: string;
   status: string;
   species: string;

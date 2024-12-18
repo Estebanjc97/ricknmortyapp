@@ -1,26 +1,8 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Character } from '../../../services/characters/characters.entity';
+import { DOOMIE_CHARACTER } from '../../../utils/characters.utils';
 
-const DOOMIE_CHARACTER: Character = {
-  created: "",
-  episode: [],
-  gender: "",
-  id: 0,
-  image: "",
-  location: {
-    name: "",
-    url: ""
-  },
-  name: "Doomie man",
-  origin: {
-    name: "",
-    url: ""
-  },
-  species: "",
-  status: "",
-  type: "",
-  url: "",
-}
+
 
 @Component({
   selector: 'character-card',

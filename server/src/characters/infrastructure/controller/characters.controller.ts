@@ -121,7 +121,7 @@ export class CharactersController {
   @Delete()
   async delete(@Body() data: DeleteDto, @Res() res: Response) {
     try {
-      await this.deleteCharacterUseCase.execute(data.id);
+      await this.deleteCharacterUseCase.execute(`${data.id}`);
       return res.status(HttpStatus.OK).send();
     } catch (error) {
       if (error instanceof NotFoundException) {

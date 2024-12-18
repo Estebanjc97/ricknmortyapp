@@ -2,7 +2,6 @@ import {
   IsString,
   IsArray,
   IsUrl,
-  IsDateString,
   ValidateNested,
   IsOptional,
   IsNumber,
@@ -54,13 +53,4 @@ export class CharacterDto {
 
   @IsUrl()
   url: string;
-
-  @IsOptional()
-  @IsDateString()
-  created?: string;
-}
-
-export class DeleteDto {
-  @IsNumber()
-  id: number;
 }

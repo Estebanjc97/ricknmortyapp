@@ -22,3 +22,13 @@ $image-width: 50%;
     height: auto; 
   }
 }
+
+.login-btn {
+  margin: 0px 10px;
+  display: flex;
+  cursor: pointer;
+}
+
+.user-name {
+  font-size: small;
+}

@@ -1,0 +1,13 @@
+<div class="card" (click)="handleCardClick()">
+    <div class='main'>
+      <img class='card-image' [src]="character.image" alt="Rick And Morty Character Image" />
+      <h2> {{ character.name }} </h2>
+      <span class='description'>
+        <span>status: {{ character.status }}</span>
+      </span>
+      <hr />
+      <div class='base-info'>
+        <p> Rick and Morty Universe </p>
+      </div>
+    </div>
+</div>

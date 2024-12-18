@@ -1,0 +1,18 @@
+.list-wrapper {
+    margin-top: 120px;
+    margin-left: 50px;
+    margin-right: 50px;
+    min-height: 20vh;
+}
+
+.list-paginator {
+    background-color: transparent;
+}
+
+.list-item {
+    overflow: visible;
+    transition: 0.5s all;
+    &:hover {
+        z-index: 1;
+    }
+}

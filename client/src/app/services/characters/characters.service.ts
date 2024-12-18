@@ -9,8 +9,7 @@ import { Character } from './characters.entity';
 })
 export class CharactersService {
 
-  //private apiUrl = 'https://ricknmortyserver-467042232272.us-central1.run.app';
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://ricknmortyserver-467042232272.us-central1.run.app';
 
   constructor(private http: HttpClient) { }
 

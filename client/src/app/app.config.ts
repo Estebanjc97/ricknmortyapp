@@ -8,6 +8,7 @@ import { provideFirebaseApp, initializeApp, initializeServerApp } from '@angular
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { isPlatformBrowser } from '@angular/common';
 
+//TODO: Store this in env variables.
 const firebaseConfig = {
   apiKey: "AIzaSyAwL6i1t3wxlrl4AcVbVPmUiqU6MNgjjRI",
   authDomain: "ricknmortyapp-444617.firebaseapp.com",

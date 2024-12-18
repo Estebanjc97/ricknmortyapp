@@ -5,6 +5,7 @@ import { LocationsModule } from './locations/locations.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import config from './config/config';
+import { FirebaseService } from './services/firebase/firebase.service';
 
 @Module({
   imports: [
@@ -22,5 +23,6 @@ import config from './config/config';
     EpisodesModule,
     LocationsModule,
   ],
+  providers: [FirebaseService],
 })
 export class AppModule {}

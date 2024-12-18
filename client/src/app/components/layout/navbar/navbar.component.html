@@ -4,8 +4,8 @@
     </div>
     <span>Rick And Morty Universe</span>
     <span class="spacer"></span>
-    @if (currentUser()) {
-        <span class="user-name"> {{ currentUser()?.displayName }} </span>
+    @if (user()) {
+        <span class="user-name"> {{ user()?.displayName }} </span>
         <span mat-mini-fab aria-label="Log in Button" class="login-btn" matTooltip="Logout" (click)="logout()">
             <mat-icon>logout</mat-icon>
         </span>

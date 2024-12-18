@@ -1,10 +1,11 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnDestroy, Signal, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Auth, GoogleAuthProvider, signInWithPopup, User, user } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,29 +13,28 @@ import { Subscription } from 'rxjs';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent implements OnDestroy {
-  private auth: Auth = inject(Auth);
-  user = user(this.auth);
-  userSubscription: Subscription;
-  currentUser = signal<User | null>(null);
+export class NavbarComponent {
+  private authService = inject(AuthService);
+  user = this.authService.getCurrentUserSignal();
 
-  constructor() {
-    this.userSubscription = this.user.subscribe((aUser: User | null) => {
-      this.currentUser.set(aUser);
-    })
-  }
+  constructor() {}
 
   async login() {
-    await signInWithPopup(this.auth, new GoogleAuthProvider);
+    try {
+      await this.authService.login();
+      alert("Logged in!");
+    } catch (error) {
+      alert("Error loggin in, please try again.")      
+    }
   }
 
   async logout() {
-    await this.auth.signOut();
-    alert("Logged out");
-  }
-
-  ngOnDestroy() {
-    this.userSubscription.unsubscribe();
+    try {
+      await this.authService.logout();
+      alert("Logged out");
+    } catch (error) {
+      alert("Error loggin out, please try again.")      
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, inject, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Inject, inject, OnDestroy, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -24,6 +24,7 @@ import { Episode } from '../../../services/episodes/episodes.entity';
 import { isPlatformBrowser } from '@angular/common';
 import { CharactersService } from '../../../services/characters/characters.service';
 import { ConfirmationDialogComponent } from '../../common/confirmation-dialog/confirmation-dialog.component';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'character-view-dialog',
@@ -44,6 +45,9 @@ import { ConfirmationDialogComponent } from '../../common/confirmation-dialog/co
   styleUrl: './character-view-dialog.component.scss'
 })
 export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
+
+  private authService = inject(AuthService);
+  user = this.authService.getCurrentUserSignal();
 
   @ViewChild('episodesSelect') matSelect!: MatSelect;
 
@@ -144,15 +148,19 @@ export class CharacterViewDialogComponent implements OnInit, AfterViewInit {
       if (Object.prototype.hasOwnProperty.call(this.data, key)) {
         const value = this.data[key as keyof Character];
         if (typeof value === "string" && key !== "created") {
-          this.form.addControl(key, new FormControl(value, [Validators.required, Validators.minLength(3)]))
+          this.form.addControl(key, new FormControl({ value, disabled: this.user() ? false : true }, [Validators.required, Validators.minLength(3)]))
         } else if (isCharacterLocation(value)) {
-          this.form.addControl(`${key}-name`, new FormControl(value.name, [Validators.required, Validators.minLength(3)]))
-          this.form.addControl(`${key}-url`, new FormControl(value.url, [Validators.required, Validators.minLength(3)]))
+          this.form.addControl(`${key}-name`, new FormControl({ value: value.name, disabled: this.isUserLoggedin() }, [Validators.required, Validators.minLength(3)]))
+          this.form.addControl(`${key}-url`, new FormControl({ value: value.url, disabled: this.isUserLoggedin() }, [Validators.required, Validators.minLength(3)]))
         }
       }
     }
-    this.form.addControl('episodes', new FormControl(this.data.episode, [Validators.required]))
+    this.form.addControl('episodes', new FormControl({ value: this.data.episode, disabled: this.isUserLoggedin() }, [Validators.required]))
     this.setFormListenners();
+  }
+
+  isUserLoggedin() {
+    return this.user() ? false : true;
   }
 
   setFormListenners() {

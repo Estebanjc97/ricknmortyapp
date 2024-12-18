@@ -11,7 +11,7 @@
         [colspan]="2"
         [rowspan]="1"
       >
-        <mat-form-field class="form-field" appearance="outline">
+        <mat-form-field class="form-field expanded-field" appearance="outline">
           <mat-label> Name </mat-label>
           <input matInput formControlName="name">
         </mat-form-field>
@@ -110,7 +110,7 @@
         [colspan]="2"
         [rowspan]="1"
       >
-        <mat-form-field class="form-field" appearance="outline">
+        <mat-form-field class="form-field expanded-field" appearance="outline">
           <mat-label> Image </mat-label>
           <input matInput formControlName="image">
         </mat-form-field>
@@ -119,7 +119,7 @@
         [colspan]="2"
         [rowspan]="1"
       >
-        <mat-form-field class="form-field" appearance="outline">
+        <mat-form-field class="form-field expanded-field" appearance="outline">
           <mat-label> URL </mat-label>
           <input matInput formControlName="url">
         </mat-form-field>
@@ -129,7 +129,7 @@
         [colspan]="2"
         [rowspan]="1"
       >
-        <mat-form-field class="form-field" appearance="outline">
+        <mat-form-field class="form-field expanded-field" appearance="outline">
           <mat-label>Episodes</mat-label>
           <mat-select #episodesSelect formControlName="episodes" multiple>
             @for (episode of episodes(); track episode) {
@@ -151,9 +151,9 @@
   </mat-grid-list>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button [disabled]="!form.valid" (click)="handleChanges()">Apply</button>
+  <button mat-button [disabled]="!form.valid || isUserLoggedin()" (click)="handleChanges()">Apply</button>
   @if (dialogMode === "edit") {
-    <button mat-button (click)="deleteCharacter()">Delete</button>
+    <button mat-button (click)="deleteCharacter()" [disabled]="isUserLoggedin()">Delete</button>
   }
   <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

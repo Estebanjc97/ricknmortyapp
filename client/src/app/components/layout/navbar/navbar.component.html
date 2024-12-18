@@ -4,6 +4,16 @@
     </div>
     <span>Rick And Morty Universe</span>
     <span class="spacer"></span>
+    @if (currentUser()) {
+        <span class="user-name"> {{ currentUser()?.displayName }} </span>
+        <span mat-mini-fab aria-label="Log in Button" class="login-btn" matTooltip="Logout" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+        </span>
+    } @else {
+        <span mat-mini-fab aria-label="Log in Button" class="login-btn" matTooltip="Login" (click)="login()">
+            <mat-icon>login</mat-icon>
+        </span>
+    }
     <a href="https://github.com/Estebanjc97/ricknmortyapp" target="_blank" class="code-icon" matTooltip="Go to Github Repo">
         <mat-icon>code</mat-icon>
     </a>
